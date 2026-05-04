@@ -61,7 +61,7 @@ public class Transaction {
     public String toString() {
         String typeString = isExpense ? "EXPENSE" : "INCOME";
         if(category!=null)
-            return typeString + " - Amount: $" + amount + ", Date: " + date + ", Category: " + category.toString();
+            return typeString + " - Amount: $" + amount + ", Date: " + date + ", Category: " + category.getcategory();
         else
             return typeString + " - Amount: $" + amount + ", Date: " + date;
     }

@@ -37,6 +37,7 @@ public class controller {
         Transaction expense = new Transaction(amount, category, true);
 
         if (loggedInUserId != -1) {
+            System.out.println(category.getcategory());
             dbManager.addTransaction(loggedInUserId, amount, category.getcategory(), expense.getDate().toString(), true);
         }
         transactions.add(expense);
@@ -59,10 +60,12 @@ public class controller {
     public void clearTransactions(){
         transactions.clear();
     }
-    public void getAllTransactions(){
+    public List<Transaction>  getAllTransactions(){
+        List<Transaction> allTransactions = new ArrayList<>();
         if(loggedInUserId != -1) {
-            dbManager.getAllUserTransactions(loggedInUserId);
+            allTransactions= dbManager.getAllUserTransactions(loggedInUserId);
         }
+        return allTransactions;
     }
 
     public double calculateDailyLimit(){

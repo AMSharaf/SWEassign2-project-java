@@ -298,7 +298,8 @@ public class MasroofyApp extends Application {
         refreshBtn.setOnAction(e -> refreshUI());
         Button allHisotryBtn = new Button("All Transactions");
         allHisotryBtn.setOnAction(e -> {
-            for (Transaction transaction : appController.getTransictions()) {
+            historyListView.getItems().clear();
+            for (Transaction transaction : appController.getAllTransactions()) {
                 historyListView.getItems().add(transaction.toString());
             }
         });
@@ -310,9 +311,9 @@ public class MasroofyApp extends Application {
         try {
             double amount = Double.parseDouble(expenseAmountField.getText());
             String selectedCategory = categoryBox.getValue();
-
             if (selectedCategory != null && appController.validateInput(amount)  ) {
                 category newCat = new category(selectedCategory);
+                //System.out.println(newCat.getcategory());
                 appController.addExpense(amount, newCat);
 
                 expenseAmountField.clear();

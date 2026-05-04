@@ -104,7 +104,6 @@ public class DatabaseManager {
         try (Connection conn = connect()) {
             conn.setAutoCommit(false);
 
-            // Add the new PreparedStatement for getting the budget ID
             try (PreparedStatement getBudgetStmt = conn.prepareStatement(getBudgetSql);
                  PreparedStatement insertStmt = conn.prepareStatement(insertSql);
                  PreparedStatement updateStmt = conn.prepareStatement(updateBudgetSql)) {
@@ -114,7 +113,7 @@ public class DatabaseManager {
 
                 int budgetId = -1;
                 if (rs.next()) {
-                    budgetId = rs.getInt("id"); // Grab the ID from the database
+                    budgetId = rs.getInt("id");
                 } else {
                     System.out.println("Cannot add transaction: No active budget found for this user.");
                     conn.rollback();
@@ -122,7 +121,7 @@ public class DatabaseManager {
                 }
 
                 insertStmt.setInt(1, userId);
-                insertStmt.setInt(2, budgetId); // Pass the fetched budgetId here! (Changed to setInt)
+                insertStmt.setInt(2, budgetId);
                 insertStmt.setDouble(3, amount);
                 insertStmt.setString(4, category);
                 insertStmt.setString(5, date);
@@ -159,7 +158,7 @@ public class DatabaseManager {
         String sql = "SELECT amount, category, date, is_expense FROM transactions WHERE budget_id = (SELECT id FROM budgets WHERE user_id = ?)";
 
         try (Connection conn = connect(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setInt(1, userId); // This drops your userId into the subquery
+            pstmt.setInt(1, userId);
             ResultSet rs = pstmt.executeQuery();
 
             while (rs.next()) {
@@ -185,7 +184,7 @@ public class DatabaseManager {
 
         List<Transaction> transactions = new ArrayList<>();
 
-        String sql = "SELECT amount, category, date, is_expense FROM transactions WHERE budget_id = ?";
+        String sql = "SELECT amount, category, date, is_expense FROM transactions WHERE user_id = ?";
 
         try (Connection conn = connect(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
@@ -206,11 +205,8 @@ public class DatabaseManager {
                 boolean is_exp = rs.getBoolean("is_expense");
 
                 Transaction trans;
-
                 if(is_exp)
-
                     trans = new Transaction(amount, new category(categoryName), date,is_exp );
-
                 else trans= new Transaction(amount, null, date,is_exp);
 
                 transactions.add(trans);
