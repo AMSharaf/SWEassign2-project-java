@@ -155,9 +155,11 @@ public class DatabaseManager {
 
     public List<Transaction> getUserTransactions(int userId) {
         List<Transaction> transactions = new ArrayList<>();
-        String sql = "SELECT amount, category, date, is_expense FROM transactions WHERE user_id = ?";
+
+        String sql = "SELECT amount, category, date, is_expense FROM transactions WHERE budget_id = (SELECT id FROM budgets WHERE user_id = ?)";
+
         try (Connection conn = connect(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setInt(1, userId);
+            pstmt.setInt(1, userId); // This drops your userId into the subquery
             ResultSet rs = pstmt.executeQuery();
 
             while (rs.next()) {
@@ -165,17 +167,66 @@ public class DatabaseManager {
                 String categoryName = rs.getString("category");
                 LocalDate date = LocalDate.parse(rs.getString("date"));
                 boolean is_exp = rs.getBoolean("is_expense");
+
                 Transaction trans;
-                if(is_exp)
-                     trans = new Transaction(amount, new category(categoryName), date,is_exp );
-                else trans= new Transaction(amount, null, date,is_exp);
+                if(is_exp) {
+                    trans = new Transaction(amount, new category(categoryName), date, is_exp);
+                } else {
+                    trans = new Transaction(amount, null, date, is_exp);
+                }
                 transactions.add(trans);
             }
         } catch (SQLException e) {
-            System.out.println("Error fetching expenses: " + e.getMessage());
+            System.out.println("Error fetching transactions: " + e.getMessage());
         }
         return transactions;
     }
+    public List<Transaction> getAllUserTransactions(int userId) {
+
+        List<Transaction> transactions = new ArrayList<>();
+
+        String sql = "SELECT amount, category, date, is_expense FROM transactions WHERE budget_id = ?";
+
+        try (Connection conn = connect(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setInt(1, userId);
+
+            ResultSet rs = pstmt.executeQuery();
+
+
+
+            while (rs.next()) {
+
+                double amount = rs.getDouble("amount");
+
+                String categoryName = rs.getString("category");
+
+                LocalDate date = LocalDate.parse(rs.getString("date"));
+
+                boolean is_exp = rs.getBoolean("is_expense");
+
+                Transaction trans;
+
+                if(is_exp)
+
+                    trans = new Transaction(amount, new category(categoryName), date,is_exp );
+
+                else trans= new Transaction(amount, null, date,is_exp);
+
+                transactions.add(trans);
+
+            }
+
+        } catch (SQLException e) {
+
+            System.out.println("Error fetching expenses: " + e.getMessage());
+
+        }
+
+        return transactions;
+
+    }
+
 
     public void addBudgetCycle(int userId, double amount, String startDate, String endDate) {
         String deleteSql = "DELETE FROM budgets WHERE user_id = ?";

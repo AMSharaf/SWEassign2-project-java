@@ -56,6 +56,14 @@ public class controller {
         checkThreshold();
 
     }
+    public void clearTransactions(){
+        transactions.clear();
+    }
+    public void getAllTransactions(){
+        if(loggedInUserId != -1) {
+            dbManager.getAllUserTransactions(loggedInUserId);
+        }
+    }
 
     public double calculateDailyLimit(){
         return budgetCycle.calculateDailyLimit();

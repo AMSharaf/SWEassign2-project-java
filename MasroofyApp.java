@@ -14,7 +14,7 @@ public class MasroofyApp extends Application {
     private final double INITIAL_BUDGET = 0;
 
     private Stage window;
-    private Scene loginScene, signupScene, dashboardScene,addBudgetScene;
+    private Scene loginScene, signupScene, dashboardScene,addBudgetScene, historyScene;
 
     private Label balanceLabel;
     private Label dailyLimitLabel;
@@ -53,6 +53,14 @@ public class MasroofyApp extends Application {
         TextField numberofDaysField = new TextField();
         numberofDaysField.setPromptText("Days");
         numberofDaysField.setMaxWidth(250);
+        Button back = new Button("back");
+        back.setOnAction(event -> {
+            amountField.clear();
+            numberofDaysField.clear();
+            window.setScene(dashboardScene);
+        });
+        back.setStyle("-fx-font-size: 24px;");
+        back.setAlignment(Pos.TOP_LEFT);
 
         Button addBudgetBtn = new Button("add budget");
         addBudgetBtn.setStyle("-fx-font-weight: bold; -fx-pref-width: 100px;");
@@ -67,14 +75,16 @@ public class MasroofyApp extends Application {
             }
             amountField.clear();
             numberofDaysField.clear();
+            appController.clearTransactions();
             window.setScene(dashboardScene);
         });
-        layout.getChildren().addAll(title, amountField, numberofDaysField, addBudgetBtn);
+
+        back.setAlignment(Pos.TOP_LEFT);
+        layout.getChildren().addAll(back,title, amountField, numberofDaysField, addBudgetBtn);
 
         addBudgetScene = new Scene(layout, 800, 400);
 
     }
-    // --- 1. Login UI ---
     private void initLoginScene() {
         VBox layout = new VBox(15);
         layout.setAlignment(Pos.CENTER);
@@ -253,7 +263,7 @@ public class MasroofyApp extends Application {
         VBox IncomeForm = new VBox(10);
         IncomeForm.setPadding(new Insets(20));
 
-        Label formTitle = new Label("Log New Expense");
+        Label formTitle = new Label("Log New Income");
         formTitle.setStyle("-fx-font-weight: bold;");
 
         incomeAmountField = new TextField();
@@ -266,13 +276,10 @@ public class MasroofyApp extends Application {
         return IncomeForm;
     }
     private HBox createFormsContainer() {
-        // Create an HBox with 30 pixels of spacing between the two forms
         HBox formsContainer = new HBox(30);
 
-        // Center the forms if you want them in the middle of the screen
         formsContainer.setAlignment(Pos.CENTER);
 
-        // Add both VBoxes to the HBox
         formsContainer.getChildren().addAll(createExpenseForm(), createIncomeForm());
 
         return formsContainer;
@@ -289,8 +296,13 @@ public class MasroofyApp extends Application {
 
         Button refreshBtn = new Button("Refresh History");
         refreshBtn.setOnAction(e -> refreshUI());
-
-        historySection.getChildren().addAll(historyTitle, historyListView, refreshBtn);
+        Button allHisotryBtn = new Button("All Transactions");
+        allHisotryBtn.setOnAction(e -> {
+            for (Transaction transaction : appController.getTransictions()) {
+                historyListView.getItems().add(transaction.toString());
+            }
+        });
+        historySection.getChildren().addAll(historyTitle, historyListView, refreshBtn, allHisotryBtn);
         return historySection;
     }
 

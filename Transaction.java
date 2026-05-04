@@ -7,10 +7,8 @@ public class Transaction {
     private LocalDate date;
     private category category;
 
-    // NEW: Boolean to track if this is an expense (true) or income (false)
     private boolean isExpense;
 
-    // Constructor for when the user doesn't provide a date (defaults to today)
     public Transaction(double amount, category category, boolean isExpense) {
         this.amount = amount;
         this.category = category;
@@ -18,7 +16,6 @@ public class Transaction {
         this.isExpense = isExpense;
     }
 
-    // Constructor for when the user provides a specific date (e.g., when loading from database)
     public Transaction(double amount, category category, LocalDate date, boolean isExpense) {
         this.amount = amount;
         this.category = category;
@@ -32,7 +29,6 @@ public class Transaction {
         this.isExpense = isExpense;
     }
 
-    // Getters
     public double getAmount() {
         return amount;
     }
@@ -49,7 +45,6 @@ public class Transaction {
         return isExpense;
     }
 
-    // Placeholder methods
     public void save(){
         System.out.println("Transaction saved");
     }
