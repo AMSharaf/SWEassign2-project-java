@@ -17,33 +17,49 @@ public class DatabaseManager {
     }
 
     private void createTables() {
-        String drop="DROP TABLE IF EXISTS users ;";
-        String drop2="DROP TABLE IF EXISTS expenses;";
+        String drop = "DROP TABLE IF EXISTS users;";
+        String drop2 = "DROP TABLE IF EXISTS transactions;";
+        String drop3 = "DROP TABLE IF EXISTS budgets;";
+
         String usersTable = "CREATE TABLE IF NOT EXISTS users ("
                 + "id INTEGER PRIMARY KEY AUTOINCREMENT,"
                 + "username TEXT UNIQUE NOT NULL,"
                 + "password TEXT NOT NULL"
                 + ");";
 
-        String expensesTable = "CREATE TABLE IF NOT EXISTS expenses ("
+        String transactionsTable = "CREATE TABLE IF NOT EXISTS transactions ("
+                + "id INTEGER PRIMARY KEY AUTOINCREMENT,"
+                + "user_id INTEGER NOT NULL,"
+                + "budget_id INTEGER NOT NULL,"
+                + "amount REAL NOT NULL,"
+                + "category TEXT ,"
+                + "date TEXT NOT NULL,"
+                + "is_expense BOOLEAN NOT NULL," // Keeps the boolean we added earlier
+                + "FOREIGN KEY(user_id) REFERENCES users(id),"
+                + "FOREIGN KEY(budget_id) REFERENCES budgets(id)"
+                + ");";
+
+        String budgetsTable = "CREATE TABLE IF NOT EXISTS budgets ("
                 + "id INTEGER PRIMARY KEY AUTOINCREMENT,"
                 + "user_id INTEGER NOT NULL,"
                 + "amount REAL NOT NULL,"
-                + "category TEXT NOT NULL,"
-                + "date TEXT NOT NULL,"
+                + "remaining REAL NOT NULL,"
+                + "start_date TEXT NOT NULL,"
+                + "end_date TEXT NOT NULL,"
                 + "FOREIGN KEY(user_id) REFERENCES users(id)"
                 + ");";
 
         try (Connection conn = connect(); Statement stmt = conn.createStatement()) {
 //            stmt.execute(drop);
 //            stmt.execute(drop2);
+//            stmt.execute(drop3);
             stmt.execute(usersTable);
-            stmt.execute(expensesTable);
+            stmt.execute(transactionsTable);
+            stmt.execute(budgetsTable);
         } catch (SQLException e) {
             System.out.println("Error creating tables: " + e.getMessage());
         }
     }
-
 
     public boolean registerUser(String username, String password) {
         String sql = "INSERT INTO users(username, password) VALUES(?, ?)";
@@ -65,7 +81,7 @@ public class DatabaseManager {
             pstmt.setString(2, password);
             ResultSet rs = pstmt.executeQuery();
             if (rs.next()) {
-                return rs.getInt("id"); // Return the user's ID
+                return rs.getInt("id");
             }
         } catch (SQLException e) {
             System.out.println("Login error: " + e.getMessage());
@@ -73,24 +89,73 @@ public class DatabaseManager {
         return -1;
     }
 
+    public void addTransaction(int userId, double amount, String category, String date, boolean isExpense) {
+        String getBudgetSql = "SELECT id FROM budgets WHERE user_id = ?";
 
-    public void addExpense(int userId, double amount, String category, String date) {
-        String sql = "INSERT INTO expenses(user_id, amount, category, date) VALUES(?, ?, ?, ?)";
-        try (Connection conn = connect(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setInt(1, userId);
-            pstmt.setDouble(2, amount);
-            pstmt.setString(3, category);
-            pstmt.setString(4, date);
-            pstmt.executeUpdate();
+        String insertSql = "INSERT INTO transactions(user_id, budget_id, amount, category, date, is_expense) VALUES(?, ?, ?, ?, ?, ?)";
+
+        String updateBudgetSql;
+        if (isExpense) {
+            updateBudgetSql = "UPDATE budgets SET amount = amount - ? WHERE user_id = ? ";
+        } else {
+            updateBudgetSql = "UPDATE budgets SET amount = amount + ? WHERE user_id = ? ";
+        }
+
+        try (Connection conn = connect()) {
+            conn.setAutoCommit(false);
+
+            // Add the new PreparedStatement for getting the budget ID
+            try (PreparedStatement getBudgetStmt = conn.prepareStatement(getBudgetSql);
+                 PreparedStatement insertStmt = conn.prepareStatement(insertSql);
+                 PreparedStatement updateStmt = conn.prepareStatement(updateBudgetSql)) {
+
+                getBudgetStmt.setInt(1, userId);
+                ResultSet rs = getBudgetStmt.executeQuery();
+
+                int budgetId = -1;
+                if (rs.next()) {
+                    budgetId = rs.getInt("id"); // Grab the ID from the database
+                } else {
+                    System.out.println("Cannot add transaction: No active budget found for this user.");
+                    conn.rollback();
+                    return;
+                }
+
+                insertStmt.setInt(1, userId);
+                insertStmt.setInt(2, budgetId); // Pass the fetched budgetId here! (Changed to setInt)
+                insertStmt.setDouble(3, amount);
+                insertStmt.setString(4, category);
+                insertStmt.setString(5, date);
+                insertStmt.setBoolean(6, isExpense);
+                insertStmt.executeUpdate();
+
+                updateStmt.setDouble(1, amount);
+                updateStmt.setInt(2, userId);
+                int rowsUpdated = updateStmt.executeUpdate();
+
+                conn.commit();
+
+                if (rowsUpdated == 0) {
+                    System.out.println("Transaction saved, but no active budget cycle was found to update.");
+                } else {
+                    System.out.println("Transaction saved and budget updated successfully!");
+                }
+
+            } catch (SQLException e) {
+                conn.rollback();
+                System.out.println("Transaction failed, rolling back: " + e.getMessage());
+            } finally {
+                conn.setAutoCommit(true);
+            }
+
         } catch (SQLException e) {
-            System.out.println("Error saving expense: " + e.getMessage());
+            System.out.println("Database connection error: " + e.getMessage());
         }
     }
 
-    public List<Expense> getUserExpenses(int userId) {
-        List<Expense> expenses = new ArrayList<>();
-        String sql = "SELECT amount, category, date FROM expenses WHERE user_id = ?";
-
+    public List<Transaction> getUserTransactions(int userId) {
+        List<Transaction> transactions = new ArrayList<>();
+        String sql = "SELECT amount, category, date, is_expense FROM transactions WHERE user_id = ?";
         try (Connection conn = connect(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, userId);
             ResultSet rs = pstmt.executeQuery();
@@ -99,13 +164,73 @@ public class DatabaseManager {
                 double amount = rs.getDouble("amount");
                 String categoryName = rs.getString("category");
                 LocalDate date = LocalDate.parse(rs.getString("date"));
-
-                Expense exp = new Expense(amount, new category(categoryName), date);
-                expenses.add(exp);
+                boolean is_exp = rs.getBoolean("is_expense");
+                Transaction trans;
+                if(is_exp)
+                     trans = new Transaction(amount, new category(categoryName), date,is_exp );
+                else trans= new Transaction(amount, null, date,is_exp);
+                transactions.add(trans);
             }
         } catch (SQLException e) {
             System.out.println("Error fetching expenses: " + e.getMessage());
         }
-        return expenses;
+        return transactions;
+    }
+
+    public void addBudgetCycle(int userId, double amount, String startDate, String endDate) {
+        String deleteSql = "DELETE FROM budgets WHERE user_id = ?";
+        String insertSql = "INSERT INTO budgets(user_id, amount,remaining, start_date, end_date) VALUES(?, ?, ?, ?, ?)";
+
+        try (Connection conn = connect()) {
+            conn.setAutoCommit(false);
+
+            try (PreparedStatement deleteStmt = conn.prepareStatement(deleteSql);
+                 PreparedStatement insertStmt = conn.prepareStatement(insertSql)) {
+
+                deleteStmt.setInt(1, userId);
+                int deletedRows = deleteStmt.executeUpdate();
+                if (deletedRows > 0) {
+                    System.out.println("Overwriting " + deletedRows + " old budget(s)...");
+                }
+
+                insertStmt.setInt(1, userId);
+                insertStmt.setDouble(2, amount);
+                insertStmt.setDouble(3, amount);
+                insertStmt.setString(4, startDate);
+                insertStmt.setString(5, endDate);
+                insertStmt.executeUpdate();
+
+                conn.commit();
+                System.out.println("New budget cycle saved successfully!");
+
+            } catch (SQLException e) {
+                conn.rollback();
+                System.out.println("Error saving budget cycle, rolling back: " + e.getMessage());
+            } finally {
+                conn.setAutoCommit(true);
+            }
+
+        } catch (SQLException e) {
+            System.out.println("Database connection error: " + e.getMessage());
+        }
+    }
+
+    public BudgetCycle getUserBudgetCycle(int userId) {
+        String sql = "SELECT id, amount, start_date, end_date FROM budgets WHERE user_id = ?";
+
+        try (Connection conn = connect(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, userId);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                int id = rs.getInt("id");
+                double amount = rs.getDouble("amount");
+                LocalDate startDate = LocalDate.parse(rs.getString("start_date"));
+                LocalDate endDate = LocalDate.parse(rs.getString("end_date"));
+                return new BudgetCycle(id, amount, startDate, endDate);
+            }
+        } catch (SQLException e) {
+            System.out.println("Error fetching budget cycle: " + e.getMessage());
+        }
+        return null;
     }
 }

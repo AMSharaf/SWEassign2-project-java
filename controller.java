@@ -4,51 +4,73 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 public class controller {
-    private List<Expense> expenses;
+    private List<Transaction> transactions ;
     private BudgetCycle budgetCycle;
     private NotificationManager notification;
     private Report report = new Report();
-
     private DatabaseManager dbManager;
     private int loggedInUserId = -1;
 
     public controller() {
-        expenses = new ArrayList<>();
+        transactions = new ArrayList<>();
         notification = new NotificationManager();
         dbManager = new DatabaseManager();
     }
     public boolean validateInput(double amount) {
-        if(budgetCycle.getTotalAllowance()-amount<0) {
+        if(budgetCycle.getRemainingBalance()-amount<0) {
             return false;
         }
         else return true;
     }
     public void createBudget(double total,int days){
-        budgetCycle= new BudgetCycle(total,LocalDate.now(),LocalDate.now().plusDays(days));
+        budgetCycle= new BudgetCycle(loggedInUserId,total,LocalDate.now(),LocalDate.now().plusDays(days));
+        if (loggedInUserId != -1) {
+            dbManager.addBudgetCycle(loggedInUserId,total,LocalDate.now().toString(),LocalDate.now().plusDays(days).toString());
+        }
+
     }
     public void addExpense(double amount, category category){
         if (!validateInput(amount)){
             System.out.println("INVALID INPUT");
             return;
         }
-        Expense expense = new Expense(amount, category);
+        Transaction expense = new Transaction(amount, category, true);
 
         if (loggedInUserId != -1) {
-            dbManager.addExpense(loggedInUserId, amount, category.getcategory(), expense.getDate().toString());
+            dbManager.addTransaction(loggedInUserId, amount, category.getcategory(), expense.getDate().toString(), true);
         }
-
-        expenses.add(expense);
+        transactions.add(expense);
         budgetCycle.updateBalance(amount);
         checkThreshold();
+    }
+
+    public void addIncome(double amount){
+        Transaction income = new Transaction(amount,false);
+
+        if (loggedInUserId != -1) {
+            dbManager.addTransaction(loggedInUserId, amount,null, income.getDate().toString(), false);
+        }
+        transactions.add(income);
+
+        budgetCycle.addIncome(amount);
+        checkThreshold();
+
     }
 
     public double calculateDailyLimit(){
         return budgetCycle.calculateDailyLimit();
     }
 
-    public List<Expense> getTransictions() {
-        return expenses;
+    public List<Transaction> getTransictions() {
+        return transactions;
     }
+    public double getRemainingBalance(){
+        return budgetCycle.getRemainingBalance();
+    }
+    public double getTotalAllowance(){
+        return budgetCycle.getTotalAllowance();
+    }
+
     public void checkThreshold(){
         double total = budgetCycle.getTotalAllowance();
         double remaining = budgetCycle.getRemainingBalance();
@@ -62,7 +84,7 @@ public class controller {
     }
 
     public void generateReport(){
-        report.generate(expenses);
+        report.generate(transactions);
     }
 
     public boolean register(String username, String password) {
@@ -72,12 +94,13 @@ public class controller {
     public boolean login(String username, String password) {
         int userId = dbManager.authenticateUser(username, password);
         if (userId != -1) {
-            this.loggedInUserId = userId;
-            this.expenses = dbManager.getUserExpenses(userId);
-
-            for(Expense e : expenses) {
-                budgetCycle.updateBalance(e.getAmount());
+            if(dbManager.getUserBudgetCycle(userId)==null){
+                System.out.println("INVALID INPUT");
+                dbManager.addBudgetCycle(userId,0,LocalDate.now().toString(),LocalDate.now().plusDays(30).toString());
             }
+            this.loggedInUserId = userId;
+            this.transactions = dbManager.getUserTransactions(userId);
+            this.budgetCycle= dbManager.getUserBudgetCycle(userId);
             return true;
         }
         return false;
@@ -85,7 +108,7 @@ public class controller {
 
     public void logout() {
         this.loggedInUserId = -1;
-        this.expenses.clear(); // clear RAM
+        this.transactions.clear(); // clear RAM
     }
 
 }

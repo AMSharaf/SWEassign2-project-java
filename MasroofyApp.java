@@ -11,14 +11,15 @@ import javafx.stage.Stage;
 public class MasroofyApp extends Application {
 
     private controller appController;
-    private final double INITIAL_BUDGET = 5000.0;
+    private final double INITIAL_BUDGET = 0;
 
     private Stage window;
-    private Scene loginScene, signupScene, dashboardScene;
+    private Scene loginScene, signupScene, dashboardScene,addBudgetScene;
 
     private Label balanceLabel;
     private Label dailyLimitLabel;
     private TextField expenseAmountField;
+    private TextField incomeAmountField;
     private ComboBox<String> categoryBox;
     private ListView<String> historyListView;
 
@@ -28,16 +29,51 @@ public class MasroofyApp extends Application {
         window.setTitle("Masroofy - Expense Tracker");
 
         appController = new controller();
-        appController.createBudget(INITIAL_BUDGET, 30);
 
         initLoginScene();
         initSignupScene();
         initDashboardScene();
+        initAddBudgetScene();
 
         window.setScene(loginScene);
         window.show();
     }
+    private void initAddBudgetScene() {
+        VBox layout = new VBox(15);
+        layout.setAlignment(Pos.CENTER);
+        layout.setPadding(new Insets(40));
 
+        Label title = new Label("Masroofy - Add Budget");
+        title.setStyle("-fx-font-size: 24px; -fx-font-weight: bold;");
+
+        TextField amountField = new TextField();
+        amountField.setPromptText("Amount");
+        amountField.setMaxWidth(250);
+
+        TextField numberofDaysField = new TextField();
+        numberofDaysField.setPromptText("Days");
+        numberofDaysField.setMaxWidth(250);
+
+        Button addBudgetBtn = new Button("add budget");
+        addBudgetBtn.setStyle("-fx-font-weight: bold; -fx-pref-width: 100px;");
+        addBudgetBtn.setOnAction(e -> {
+            double amount = Double.parseDouble(amountField.getText());
+            try {
+                int days= Integer.parseInt(numberofDaysField.getText());
+                appController.createBudget(amount,days);
+                refreshUI();
+            } catch (NumberFormatException ex) {
+                showAlert("Please enter numbers only for the amount.");
+            }
+            amountField.clear();
+            numberofDaysField.clear();
+            window.setScene(dashboardScene);
+        });
+        layout.getChildren().addAll(title, amountField, numberofDaysField, addBudgetBtn);
+
+        addBudgetScene = new Scene(layout, 800, 400);
+
+    }
     // --- 1. Login UI ---
     private void initLoginScene() {
         VBox layout = new VBox(15);
@@ -65,6 +101,7 @@ public class MasroofyApp extends Application {
             if (appController.login(user, pass)) {
                 userField.clear();
                 passField.clear();
+
                 window.setScene(dashboardScene); // Go to Dashboard
                 refreshUI(); // Load data from DB!
             } else {
@@ -84,7 +121,6 @@ public class MasroofyApp extends Application {
         loginScene = new Scene(layout, 800, 400);
     }
 
-    // --- 2. Signup UI ---
     private void initSignupScene() {
         VBox layout = new VBox(15);
         layout.setAlignment(Pos.CENTER);
@@ -143,13 +179,12 @@ public class MasroofyApp extends Application {
         signupScene = new Scene(layout, 800, 400);
     }
 
-    // --- 3. Main Dashboard UI ---
     private void initDashboardScene() {
         BorderPane mainLayout = new BorderPane();
         mainLayout.setPadding(new Insets(15));
 
         mainLayout.setTop(createDashboardHeader());
-        mainLayout.setCenter(createExpenseForm());
+        mainLayout.setCenter(createFormsContainer());
         mainLayout.setRight(createHistoryView());
 
         dashboardScene = new Scene(mainLayout, 800, 400);
@@ -159,7 +194,6 @@ public class MasroofyApp extends Application {
         BorderPane topSection = new BorderPane();
         topSection.setStyle("-fx-background-color: #f0f0f0; -fx-padding: 10; -fx-border-color: #ccc;");
 
-        // Center elements (Stats)
         VBox dashboardStats = new VBox(5);
         dashboardStats.setAlignment(Pos.CENTER);
 
@@ -174,7 +208,6 @@ public class MasroofyApp extends Application {
 
         dashboardStats.getChildren().addAll(title, balanceLabel, dailyLimitLabel, reportBtn);
 
-        // Right element (Logout Button)
         Button logoutBtn = new Button("Logout");
         logoutBtn.setStyle("-fx-background-color: #ff4c4c; -fx-text-fill: white; -fx-font-weight: bold;");
         logoutBtn.setOnAction(e -> {
@@ -182,9 +215,15 @@ public class MasroofyApp extends Application {
             appController.createBudget(INITIAL_BUDGET, 30); // Reset UI budget
             window.setScene(loginScene); // Send user back to login
         });
+        Button addBudget = new Button("add Budget");
+        addBudget.setStyle("-fx-background-color: #ff4c4c; -fx-text-fill: white; -fx-font-weight: bold;");
+        addBudget.setOnAction(e -> {
+            window.setScene(addBudgetScene);
+        });
 
         topSection.setCenter(dashboardStats);
         topSection.setRight(logoutBtn);
+        topSection.setLeft(addBudget);
         BorderPane.setAlignment(logoutBtn, Pos.TOP_RIGHT);
 
         return topSection;
@@ -210,7 +249,34 @@ public class MasroofyApp extends Application {
         expenseForm.getChildren().addAll(formTitle, expenseAmountField, categoryBox, submitBtn);
         return expenseForm;
     }
+    private VBox createIncomeForm() {
+        VBox IncomeForm = new VBox(10);
+        IncomeForm.setPadding(new Insets(20));
 
+        Label formTitle = new Label("Log New Expense");
+        formTitle.setStyle("-fx-font-weight: bold;");
+
+        incomeAmountField = new TextField();
+        incomeAmountField.setPromptText("Enter Amount");
+
+        Button submitBtn = new Button("Add Income");
+        submitBtn.setOnAction(e -> handleAddIncome());
+
+        IncomeForm.getChildren().addAll(formTitle, incomeAmountField, submitBtn);
+        return IncomeForm;
+    }
+    private HBox createFormsContainer() {
+        // Create an HBox with 30 pixels of spacing between the two forms
+        HBox formsContainer = new HBox(30);
+
+        // Center the forms if you want them in the middle of the screen
+        formsContainer.setAlignment(Pos.CENTER);
+
+        // Add both VBoxes to the HBox
+        formsContainer.getChildren().addAll(createExpenseForm(), createIncomeForm());
+
+        return formsContainer;
+    }
     private VBox createHistoryView() {
         VBox historySection = new VBox(10);
         historySection.setPadding(new Insets(10));
@@ -227,7 +293,6 @@ public class MasroofyApp extends Application {
         historySection.getChildren().addAll(historyTitle, historyListView, refreshBtn);
         return historySection;
     }
-
 
     private void handleAddExpense() {
         try {
@@ -248,17 +313,31 @@ public class MasroofyApp extends Application {
             showAlert("Please enter numbers only for the amount.");
         }
     }
+    private void handleAddIncome() {
+        try {
+            double amount = Double.parseDouble(incomeAmountField.getText());
+            appController.addIncome(amount);
+            incomeAmountField.clear();
+            refreshUI();
+        } catch (NumberFormatException ex) {
+            showAlert("Please enter numbers only for the amount.");
+        }
+    }
+
+
 
     private void refreshUI() {
         historyListView.getItems().clear();
         double totalSpent = 0;
 
-        for (Expense expense : appController.getTransictions()) {
-            historyListView.getItems().add(expense.toString());
-            totalSpent += expense.getAmount();
+        for (Transaction transaction : appController.getTransictions()) {
+            historyListView.getItems().add(transaction.toString());
+            if(transaction.isExpense()){
+                totalSpent += transaction.getAmount();
+            }
         }
 
-        double currentBalance = INITIAL_BUDGET - totalSpent;
+        double currentBalance = appController.getRemainingBalance();
         balanceLabel.setText(String.format("Remaining Balance: $%.2f", currentBalance));
 
         double safeLimit = appController.calculateDailyLimit();
