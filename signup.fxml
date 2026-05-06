@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Text?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="1200.0" styleClass="root" stylesheets="@style.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <VBox alignment="TOP_CENTER" layoutX="350.0" layoutY="137.0" prefHeight="200.0" prefWidth="500.0" spacing="15.0" styleClass="card" stylesheets="@style.css">
+         <children>
+            <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="title" text="Create Account" textAlignment="CENTER">
+            </Text>
+            <TextField fx:id="signupUserField" promptText="Username" styleClass="inputField" stylesheets="@style.css" />
+            <PasswordField fx:id="signupPassField" promptText="Password" styleClass="inputField" stylesheets="@style.css" />
+            <PasswordField fx:id="signupConfirmPassField" promptText="Confirm Password" styleClass="inputField" stylesheets="@style.css" />
+            <Button mnemonicParsing="false" onAction="#handleSignup" stylesheets="@style.css" text="Sign Up">
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
+            </Button>
+            <Label onMouseClicked="#goToLogin" styleClass="title" stylesheets="@style.css" text="Already have an account? Login" textFill="WHITE">
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
+            </Label>
+         </children>
+         <padding>
+            <Insets top="20.0" />
+         </padding>
+      </VBox>
+   </children>
+</AnchorPane>

@@ -1,0 +1,116 @@
+.root {
+    -fx-font-family: "Segoe UI";
+    -fx-background-color: #0f172a;
+}
+
+.sidebar {
+    -fx-background-color: #111827;
+    -fx-padding: 20;
+    -fx-spacing: 15;
+    -fx-pref-width: 220;
+}
+
+.title {
+    -fx-text-fill: white;
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+}
+
+.button {
+    -fx-background-color: transparent;
+    -fx-text-fill: #cbd5e1;
+    -fx-font-size: 14px;
+    -fx-alignment: CENTER_LEFT;
+    -fx-padding: 10 15;
+    -fx-background-radius: 8;
+}
+
+.button:hover {
+    -fx-background-color: #1f2937;
+    -fx-text-fill: white;
+}
+
+.button:focused {
+    -fx-background-color: #2563eb;
+    -fx-text-fill: white;
+}
+
+.topbar {
+    -fx-background-color: #1e293b;
+    -fx-padding: 15;
+    -fx-spacing: 10;
+}
+
+
+
+.dashboard {
+    -fx-padding: 20;
+    -fx-spacing: 20;
+}
+
+.card {
+    -fx-background-color: #1e293b;
+    -fx-background-radius: 15;
+    -fx-padding: 20;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.4), 10, 0.2, 0, 4);
+}
+
+.box {
+    -fx-background-color: #1e293b;
+    -fx-background-radius: 15;
+    -fx-padding: 20;
+    -fx-min-width: 180;
+}
+
+
+
+.dailyBudget {
+    -fx-background-color: linear-gradient(to right, #2563eb, #1d4ed8);
+    -fx-background-radius: 15;
+    -fx-padding: 20;
+    -fx-text-fill: white;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+}
+
+.inputField {
+    -fx-background-color: #0f172a;
+    -fx-text-fill: white;
+    -fx-prompt-text-fill: #64748b;
+    -fx-background-radius: 10;
+    -fx-padding: 8 12;
+    -fx-border-color: #334155;
+    -fx-border-radius: 10;
+}
+
+.inputField:focused {
+    -fx-border-color: #2563eb;
+}
+
+.Sbutton {
+    -fx-background-color: #2563eb;
+    -fx-text-fill: white;
+    -fx-background-radius: 10;
+    -fx-padding: 10 15;
+    -fx-font-weight: bold;
+}
+
+.Sbutton:hover {
+    -fx-background-color: #1d4ed8;
+}
+
+.table {
+    -fx-background-color: #1e293b;
+    -fx-control-inner-background: #1e293b;
+    -fx-text-background-color: white;
+    -fx-background-radius: 10;
+}
+
+.table .column-header {
+    -fx-background-color: #111827;
+    -fx-text-fill: white;
+}
+
+.label {
+    -fx-text-fill: white;
+}
