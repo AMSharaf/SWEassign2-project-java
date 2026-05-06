@@ -187,13 +187,8 @@ public class DatabaseManager {
         String sql = "SELECT amount, category, date, is_expense FROM transactions WHERE user_id = ?";
 
         try (Connection conn = connect(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
-
             pstmt.setInt(1, userId);
-
             ResultSet rs = pstmt.executeQuery();
-
-
-
             while (rs.next()) {
 
                 double amount = rs.getDouble("amount");
@@ -210,17 +205,11 @@ public class DatabaseManager {
                 else trans= new Transaction(amount, null, date,is_exp);
 
                 transactions.add(trans);
-
             }
-
         } catch (SQLException e) {
-
             System.out.println("Error fetching expenses: " + e.getMessage());
-
         }
-
         return transactions;
-
     }
 
 

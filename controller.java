@@ -10,6 +10,7 @@ public class controller {
     private Report report = new Report();
     private DatabaseManager dbManager;
     private int loggedInUserId = -1;
+    private int total_expense=0;
 
     public controller() {
         transactions = new ArrayList<>();
