@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="1200.0" styleClass="root" stylesheets="@dashboard.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1">
+   <left>
+      <VBox prefHeight="200.0" prefWidth="220.0" spacing="20.0" styleClass="sidebar" stylesheets="@dashboard.css" BorderPane.alignment="CENTER">
+         <children>
+            <Label styleClass="title" stylesheets="@dashboard.css" text="Masroofy">
+               <font>
+                  <Font size="19.0" />
+               </font>
+            </Label>
+            <VBox alignment="CENTER" prefHeight="74.0" prefWidth="180.0">
+               <children>
+                  <Button mnemonicParsing="false" onAction="#goToAddBudget" prefHeight="36.0" prefWidth="133.0" styleClass="Sbutton" stylesheets="@dashboard.css" text="   Add Budget" textAlignment="CENTER" textFill="WHITE">
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </Button>
+               </children>
+            </VBox>
+            <VBox alignment="TOP_CENTER" prefHeight="126.0" prefWidth="180.0" styleClass="box" stylesheets="@dashboard.css">
+               <children>
+                  <TextField fx:id="incomeField" prefHeight="38.0" prefWidth="140.0" promptText="Add Income" styleClass="inputField" stylesheets="@dashboard.css" />
+                  <Button alignment="CENTER_RIGHT" mnemonicParsing="false" onAction="#handleAddIncome" prefHeight="35.0" prefWidth="136.0" styleClass="Sbutton" stylesheets="@dashboard.css" text="          Add" textAlignment="JUSTIFY">
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </Button>
+               </children>
+            </VBox>
+            <VBox prefHeight="122.0" prefWidth="180.0" styleClass="box" stylesheets="@dashboard.css">
+               <children>
+                  <TextField fx:id="expenseField" promptText="Add Expense" styleClass="inputField" stylesheets="@dashboard.css" />
+                  <ComboBox fx:id="chooseCategory" prefWidth="150.0" promptText="Category" styleClass="inputField" stylesheets="@dashboard.css" />
+                  <Button mnemonicParsing="false" onAction="#handleAddExpense" prefHeight="36.0" prefWidth="145.0" styleClass="Sbutton" stylesheets="@dashboard.css" text="           Add">
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </Button>
+               </children>
+            </VBox>
+         </children>
+      </VBox>
+   </left>
+   <top>
+      <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="1200.0" spacing="15.0" styleClass="topbar" stylesheets="@dashboard.css" BorderPane.alignment="CENTER">
+         <children>
+            <Text fill="#fafafa" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="title" text="Current Dashboard">
+               <font>
+                  <Font name="System Bold" size="40.0" />
+               </font></Text>
+            <BorderPane />
+            <VBox alignment="CENTER_RIGHT" prefHeight="70.0" prefWidth="986.0">
+               <children>
+                  <Button alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#handleLogout" prefHeight="39.0" prefWidth="78.0" styleClass="Sbutton" stylesheets="@dashboard.css" text="Logout">
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </Button>
+               </children>
+            </VBox>
+         </children>
+      </HBox>
+   </top>
+   <bottom>
+      <HBox prefHeight="0.0" prefWidth="830.0" spacing="15.0" BorderPane.alignment="CENTER" />
+   </bottom>
+   <right>
+      <VBox prefHeight="542.0" prefWidth="980.0" spacing="20.0" styleClass="dashboard" stylesheets="@dashboard.css" BorderPane.alignment="CENTER">
+         <children>
+            <HBox prefHeight="100.0" prefWidth="200.0" spacing="15.0">
+               <children>
+                  <VBox prefHeight="100.0" prefWidth="180.0" spacing="20.0" styleClass="card" stylesheets="@dashboard.css">
+                     <children>
+                        <Label stylesheets="@dashboard.css" text="Remaining Balance" />
+                        <Label fx:id="balanceLabel" stylesheets="@dashboard.css" text="0.00 EGP" />
+                     </children>
+                  </VBox>
+                  <VBox prefHeight="100.0" prefWidth="167.0" spacing="20.0" styleClass="card" stylesheets="@dashboard.css">
+                     <children>
+                        <Label stylesheets="@dashboard.css" text="Daily Budget" />
+                        <Label fx:id="dailyLimitLabel" stylesheets="@dashboard.css" text="0.00 EGP" />
+                     </children>
+                  </VBox>
+                  <VBox prefHeight="100.0" prefWidth="172.0" spacing="20.0" styleClass="card" stylesheets="@dashboard.css">
+                     <children>
+                        <Label stylesheets="@dashboard.css" text="Total Expenses" />
+                        <Label fx:id="totalExpense" stylesheets="@dashboard.css" text="0.00 EGP" />
+                     </children>
+                  </VBox>
+                  <VBox alignment="BOTTOM_CENTER" prefHeight="100.0" prefWidth="134.0" stylesheets="@dashboard.css">
+                     <children>
+                        <Button alignment="CENTER" mnemonicParsing="false" onAction="#showAllHistory" prefHeight="38.0" styleClass="Sbutton" stylesheets="@dashboard.css" text="All Transaction" textAlignment="CENTER">
+                           <cursor>
+                              <Cursor fx:constant="HAND" />
+                           </cursor>
+                        </Button>
+                     </children>
+                  </VBox>
+                  <VBox alignment="BOTTOM_CENTER" prefHeight="100.0" prefWidth="134.0">
+                     <children>
+                        <Button mnemonicParsing="false" onAction="#refreshUI" prefHeight="39.0" prefWidth="154.0" styleClass="Sbutton" stylesheets="@dashboard.css" text="Refresh History">
+                           <cursor>
+                              <Cursor fx:constant="HAND" />
+                           </cursor>
+                        </Button>
+                     </children>
+                  </VBox>
+                  <VBox alignment="BOTTOM_CENTER" prefHeight="100.0" prefWidth="88.0" stylesheets="@dashboard.css">
+                     <children>
+                        <Button mnemonicParsing="false" onAction="#generateReport" prefHeight="39.0" prefWidth="86.0" styleClass="Sbutton" stylesheets="@dashboard.css" text="   Print">
+                           <cursor>
+                              <Cursor fx:constant="HAND" />
+                           </cursor>
+                        </Button>
+                     </children>
+                  </VBox>
+               </children>
+            </HBox>
+            <Label styleClass="title" stylesheets="@dashboard.css" text="Transaction History" />
+            <ListView fx:id="historyList" prefHeight="223.0" prefWidth="800.0" styleClass="table" stylesheets="@dashboard.css" />
+         </children>
+      </VBox>
+   </right>
+</BorderPane>

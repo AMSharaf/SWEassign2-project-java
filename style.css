@@ -1,0 +1,57 @@
+/* ========== ROOT BACKGROUND ========== */
+.root {
+    -fx-background-color: linear-gradient(to bottom right, #1e1e2f, #2c2c3e);
+}
+
+.card {
+    -fx-background-color: #2f2f44;
+    -fx-background-radius: 15;
+    -fx-padding: 25;
+    
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.4), 15, 0.2, 0, 5);
+}
+
+.title {
+    -fx-text-fill: white;
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+}
+
+.inputField {
+    -fx-background-color: #3a3a55;
+    -fx-text-fill: white;
+    -fx-prompt-text-fill: #aaa;
+
+    -fx-background-radius: 8;
+    -fx-padding: 10;
+}
+
+.inputField:focused {
+    -fx-border-color: #6c63ff;
+    -fx-border-width: 1.5;
+    -fx-border-radius: 8;
+}
+
+.button {
+    -fx-background-color: #6c63ff;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+
+    -fx-background-radius: 10;
+    -fx-padding: 10;
+}
+
+.button:hover {
+    -fx-background-color: #5a52e0;
+    -fx-cursor: hand;
+}
+
+.text {
+    -fx-text-fill: #aaa;
+    -fx-font-size: 12px;
+}
+
+.text:hover {
+    -fx-text-fill: white;
+}
+

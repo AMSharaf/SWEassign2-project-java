@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.effect.Glow?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Text?>
+
+<AnchorPane maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="1200.0" stylesheets="@style.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1">
+    <children>
+        <VBox alignment="TOP_CENTER" layoutX="350.0" layoutY="153.0" prefHeight="200.0" prefWidth="500.0" spacing="15.0" styleClass="card">
+            <children>
+                <VBox prefHeight="500.0" prefWidth="300.0">
+                    <children>
+                        <Button onAction="#goToDashboard" mnemonicParsing="false" prefHeight="38.0" prefWidth="50.0" style="-fx-background-color: red;" styleClass="Sbutton" stylesheets="@style.css" text="Back" textFill="WHITE" />
+                    </children>
+                </VBox>
+                <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="title" text="Budget" textAlignment="CENTER" />
+                <TextField fx:id="AmountField" promptText="Amount" styleClass="inputField" />
+                <TextField fx:id="DaysField" promptText="Days" styleClass="inputField" />
+                <Button onAction="#handleAddBudget" mnemonicParsing="false" styleClass="Sbutton" text="Add Budget" />
+            </children>
+            <padding>
+                <Insets top="20.0" />
+            </padding>
+        </VBox>
+    </children>
+</AnchorPane>
